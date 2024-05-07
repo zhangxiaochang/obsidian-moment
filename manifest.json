@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "rerrange-task",
+	"name": "Rerrange-task",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "帮助用户重新安排过期任务。",
+	"author": "Shark Pepsi",
+	"authorUrl": "https://github.com/zhangxiaochang",
+	"fundingUrl": "https://github.com/zhangxiaochang/rearrange-task",
 	"isDesktopOnly": false
 }
