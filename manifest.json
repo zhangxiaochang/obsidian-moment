@@ -1,6 +1,6 @@
 {
-	"id": "rerrange-task",
-	"name": "Rerrange-task",
+	"id": "task-rerrange",
+	"name": "task-rerrange",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "帮助用户重新安排过期任务。",

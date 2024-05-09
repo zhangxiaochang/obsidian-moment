@@ -1,19 +1,18 @@
 import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting} from 'obsidian';
-import {ExampleModal} from "./model";
 
-interface MyPluginSettings {
-	mySetting: string;
-}
-
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
+// interface MyPluginSettings {
+// 	mySetting: string;
+// }
+//
+// const DEFAULT_SETTINGS: MyPluginSettings = {
+// 	mySetting: 'default'
+// }
 
 export default class HelloWorldPlugin extends Plugin {
-	settings: MyPluginSettings;
+	// settings: MyPluginSettings;
 
 	async onload() {
-		await this.loadSettings();
+		// await this.loadSettings();
 		// This creates an icon in the left ribbon. TODO 改成一个重新安排的按钮感觉更好（快捷键+按钮）
 		// const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 		// 	// Called when the user clicks the icon.
@@ -39,14 +38,15 @@ export default class HelloWorldPlugin extends Plugin {
 		// });
 		// This adds an editor command that can perform some operation on the current editor instance
 		this.addCommand({
-			id: 'rearrange-task',
+			id: 'rearrange',
 			name: '重新安排',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				console.log(editor.getLine(1));
 				const {file} = view
-				editor.setLine(1,"due:: 2024-09-19")
+				editor.setLine(1,"due:: 2024-05-11")
+				debugger
 				// @ts-ignore
-				this.app.vault.rename(file,"testest")
+				this.app.vault.rename(file,"特色图.md")
 			}
 		});
 
@@ -74,7 +74,7 @@ export default class HelloWorldPlugin extends Plugin {
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		// this.addSettingTab(new SampleSettingTab(this.app, this));
 
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
@@ -86,41 +86,41 @@ export default class HelloWorldPlugin extends Plugin {
 		// this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 	onunload() {
-		console.log('unloading plugin')
+
 	}
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
+	// async loadSettings() {
+	// 	this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	// }
+	//
+	// async saveSettings() {
+	// 	await this.saveData(this.settings);
+	// }
 
 }
 
-class SampleSettingTab extends PluginSettingTab {
-	plugin: HelloWorldPlugin;
-
-	constructor(app: App, plugin: HelloWorldPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
-}
+// class SampleSettingTab extends PluginSettingTab {
+// 	plugin: HelloWorldPlugin;
+//
+// 	constructor(app: App, plugin: HelloWorldPlugin) {
+// 		super(app, plugin);
+// 		this.plugin = plugin;
+// 	}
+//
+// 	display(): void {
+// 		const {containerEl} = this;
+//
+// 		containerEl.empty();
+//
+// 		new Setting(containerEl)
+// 			.setName('Setting #1')
+// 			.setDesc('It\'s a secret')
+// 			.addText(text => text
+// 				.setPlaceholder('Enter your secret')
+// 				.setValue(this.plugin.settings.mySetting)
+// 				.onChange(async (value) => {
+// 					this.plugin.settings.mySetting = value;
+// 					await this.plugin.saveSettings();
+// 				}));
+// 	}
+// }

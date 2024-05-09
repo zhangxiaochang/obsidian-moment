@@ -1,7 +1,6 @@
 import { App, Modal, Setting } from "obsidian";
 
-export class ExampleModal extends Modal {
-	result: string;
+export class datePickerModelPopUp extends Modal {
 	onSubmit: (result: string) => void;
 
 	constructor(app: App, onSubmit: (result: string) => void) {
@@ -14,10 +13,9 @@ export class ExampleModal extends Modal {
 		const h1 = contentEl.createEl("h1", { text: "What's your name?" });
 		h1.style.textAlign = "left"
 		const datePicker = contentEl.createEl('input');
-
 		// 设置输入框的类型为日期
 		datePicker.type = 'date';
-		datePicker.style.margin = '4px'; // 设置背景颜色为浅蓝色
+		datePicker.style.margin = '4px';
 		contentEl.style.textAlign = "center"
 		new Setting(contentEl)
 			.addButton((btn) =>
@@ -25,19 +23,16 @@ export class ExampleModal extends Modal {
 					.setButtonText("Submit")
 					.setCta()
 					.onClick(() => {
-						this.result=datePicker.value
 						this.close();
-						this.onSubmit(this.result);
+						this.onSubmit(datePicker.value);
 					}));
 
 		datePicker.focus();
-
 	}
 
 
 	onClose() {
 		let { contentEl } = this;
 		contentEl.empty();
-		debugger
 	}
 }
