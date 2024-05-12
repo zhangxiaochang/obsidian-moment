@@ -1,6 +1,6 @@
 import { App, Modal, Setting } from "obsidian";
 
-export class datePickerModelPopUp extends Modal {
+export class DatePickerModelPopUp extends Modal {
 	onSubmit: (result: string) => void;
 
 	constructor(app: App, onSubmit: (result: string) => void) {

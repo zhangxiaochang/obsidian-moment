@@ -1,4 +1,5 @@
 import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting} from 'obsidian';
+import {TaskRerrange} from "./taskRerrange";
 
 // interface MyPluginSettings {
 // 	mySetting: string;
@@ -41,12 +42,7 @@ export default class HelloWorldPlugin extends Plugin {
 			id: 'rearrange',
 			name: '重新安排',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getLine(1));
-				const {file} = view
-				editor.setLine(1,"due:: 2024-05-11")
-				debugger
-				// @ts-ignore
-				this.app.vault.rename(file,"特色图.md")
+				new TaskRerrange(this.app,editor,view).execute();
 			}
 		});
 
