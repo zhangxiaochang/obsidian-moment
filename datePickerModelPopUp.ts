@@ -28,6 +28,8 @@ export class datePickerModelPopUp extends Modal {
 					}));
 
 		datePicker.focus();
+
+		return datePicker.value;
 	}
 
 

@@ -1,4 +1,4 @@
-import {App, Editor, MarkdownView,TFile} from 'obsidian';
+import {App, Editor, MarkdownView, TFile} from 'obsidian';
 import {datePickerModelPopUp} from "./datePickerModelPopUp";
 
 export class taskRerrange {
@@ -12,11 +12,11 @@ export class taskRerrange {
 		this.markDownView = markDownView;
 	}
 
-	execute() {
+	async execute() {
 		//0 获取文件
 		const {file} = this.markDownView;
 		//1 弹窗获取日期
-		const rearrangeDue =  this.rearrangeDueObtain();
+		const rearrangeDue = await this.rearrangeDueObtain();
 		//2 组装新文件名
 		// @ts-ignore
 		const newPath = this.newPathObtian(file, rearrangeDue);
@@ -24,18 +24,23 @@ export class taskRerrange {
 		this.rearrangeTask(rearrangeDue);
 	}
 
-	rearrangeDueObtain (): String {
-		return "due: 2024-04-05"
+	async rearrangeDueObtain(): Promise<String> {
+		return new Promise<String>((resolve) => {
+			new datePickerModelPopUp(this.app, (result) => {
+				resolve(result);
+			}).open();
+		});
 	}
 
-	newPathObtian(file:TFile, rearrangeDue: String):String{
+
+	newPathObtian(file: TFile, rearrangeDue: String): String {
+		let oldPath = file.path;
 		return "xxx.md"
 	}
 
-	rearrangeTask(rearrangeDue:String){
+	rearrangeTask(rearrangeDue: String) {
 
 	}
-
 
 
 }
