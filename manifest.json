@@ -1,11 +1,11 @@
 {
-	"id": "task-rerrange",
-	"name": "task-rerrange",
+	"id": "obsidian-moment",
+	"name": "moment",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "帮助用户重新安排过期任务。",
+	"description": "Record the moments of life.",
 	"author": "Shark Pepsi",
 	"authorUrl": "https://github.com/zhangxiaochang",
-	"fundingUrl": "https://github.com/zhangxiaochang/rearrange-task",
+	"fundingUrl": "https://github.com/zhangxiaochang/obsidian-pulgin-zhangxc",
 	"isDesktopOnly": false
 }
