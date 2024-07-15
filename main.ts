@@ -22,6 +22,7 @@ export default class MyPlugin extends Plugin {
 				// 	// 向文件内容追加新内容
 				// }
 				fetchData('https://restapi.amap.com/v3/ip?key=5fa9f5cc69404e6a7299afac184fab7e');
+				fetchData('https://restapi.amap.com/v3/weather/weatherInfo?key=5fa9f5cc69404e6a7299afac184fab7e&city=110000&extensions=base');
 			}
 		});
 	}
