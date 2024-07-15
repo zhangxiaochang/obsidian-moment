@@ -1,6 +1,5 @@
 import { App, Plugin, PluginSettingTab, Setting, Notice, TFile, TFolder } from 'obsidian';
 import {Solar} from 'lunar-typescript';
-import {fetchData} from './lunartest';
 export default class MyPlugin extends Plugin {
 	async onload() {
 		this.addCommand({
@@ -21,38 +20,38 @@ export default class MyPlugin extends Plugin {
 				// 	 this.app.vault.append(file,"testestest")
 				// 	// 向文件内容追加新内容
 				// }
-				fetchData('https://restapi.amap.com/v3/ip?key=5fa9f5cc69404e6a7299afac184fab7e');
-				fetchData('https://restapi.amap.com/v3/weather/weatherInfo?key=5fa9f5cc69404e6a7299afac184fab7e&city=110000&extensions=base');
+				// fetchData('https://restapi.amap.com/v3/ip?key=5fa9f5cc69404e6a7299afac184fab7e');
+				// fetchData('https://restapi.amap.com/v3/weather/weatherInfo?key=5fa9f5cc69404e6a7299afac184fab7e&city=110000&extensions=base');
 			}
 		});
 	}
 
 
-	 checkFileInFolderExists(fileName, folderPath) {
-		// Get the Vault instance
-		const vault = this.app.vault;
-
-		// Get the folder
-		const folder = vault.getAbstractFileByPath(folderPath);
-
-		// Check if the folder exists and is a folder
-		if (!folder || !(folder instanceof TFolder)) {
-			new Notice(`The folder "${folderPath}" does not exist.`);
-			return false;
-		}
-
-		// Get all files in the folder
-		const files = folder.children.filter(file => file instanceof TFile);
-
-		// Check if the file exists in the folder
-		const fileExists = files.some(file => file.name === fileName);
-		// Show a notice with the result
-		if (fileExists) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	//  checkFileInFolderExists(fileName, folderPath) {
+	// 	// Get the Vault instance
+	// 	const vault = this.app.vault;
+	//
+	// 	// Get the folder
+	// 	const folder = vault.getAbstractFileByPath(folderPath);
+	//
+	// 	// Check if the folder exists and is a folder
+	// 	if (!folder || !(folder instanceof TFolder)) {
+	// 		new Notice(`The folder "${folderPath}" does not exist.`);
+	// 		return false;
+	// 	}
+	//
+	// 	// Get all files in the folder
+	// 	const files = folder.children.filter(file => file instanceof TFile);
+	//
+	// 	// Check if the file exists in the folder
+	// 	const fileExists = files.some(file => file.name === fileName);
+	// 	// Show a notice with the result
+	// 	if (fileExists) {
+	// 		return true;
+	// 	} else {
+	// 		return false;
+	// 	}
+	// }
 }
 
 
