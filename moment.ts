@@ -1,14 +1,22 @@
-import {App} from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, Notice, TFile, TFolder } from 'obsidian';
+import {Solar} from 'lunar-typescript';
+import {DateType} from "./enum";
 
-export class moment {
+
+export class Moment {
 	app: App;
 
 	constructor(app: App) {
 		this.app = app;
 	}
 	// 执行方法
-	public execute(){
+	public async execute(dateFormat:string,folderName:string){
 		// 1-0 获取文件名 判断是否存在 创建or获取  文件名称格式 提供枚举 做setting参数
+		var fileName = this.genfileName(dateFormat);
+		debugger
+		var filePath = folderName +"/"+fileName + ".md"
+		var file = await this.checkAndCreateFile(filePath);
+
 		// 1-1 获取月份 判断是否存在3级标题 写入or跳过 时间一般是向前的
 		// 1-2 获取日期时间
 
@@ -19,5 +27,33 @@ export class moment {
 
 		// 4-0 打开文件最下面的光标处 进行写作
 	}
+
+	private async checkAndCreateFile(filePath: string) {
+
+		let file = this.app.vault.getAbstractFileByPath(filePath);
+		if (file) {
+			new Notice('File exists');
+		} else {
+			// 文件不存在，创建文件
+			file = await this.app.vault.create(filePath, '');  // 空字符串表示创建一个空文件
+			new Notice('File did not exist and has been created');
+		}
+
+		return file;
+	}
+
+	private genfileName(dateFormat: string): string {
+		var solar = Solar.fromDate(new Date());
+		var lunar = solar.getLunar();
+		switch (dateFormat) {
+			case DateType.Lunar:
+				return lunar.getYearInChinese() + lunar.getYearInGanZhi() + lunar.getYearShengXiao() + "年";
+			case DateType.Gregorian:
+				return lunar.getYearInChinese();
+			default:
+				return lunar.getYearInChinese() + lunar.getYearInGanZhi() + lunar.getYearShengXiao() + "年";
+		}
+	}
+
 
 }

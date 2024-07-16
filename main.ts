@@ -1,11 +1,30 @@
-import { App, Plugin, PluginSettingTab, Setting, Notice, TFile, TFolder } from 'obsidian';
-import {Solar} from 'lunar-typescript';
-export default class MyPlugin extends Plugin {
+import {App, Plugin, PluginSettingTab, Setting, Notice, TFile, TFolder} from 'obsidian';
+import {DateType, DateTypes} from "./enum";
+import {Moment} from "./moment";
+
+interface Settings {
+	dateFormat: DateType;
+	folder: string;
+}
+
+const DEFAULT_SETTINGS: Settings = {
+	dateFormat: DateType.Lunar,
+	folder: ""
+};
+
+export default class moment extends Plugin {
+	settings: Settings;
+
 	async onload() {
+		// 加载插件
+		this.loadSettings();
+		this.addSettingTab(new MomentSettingTab(this.app, this));
+		// 增加命令
 		this.addCommand({
 			id: 'open-image-text-editor-modal',
 			name: 'Open Image and Text Editor Modal',
 			callback: () => {
+				new Moment(this.app).execute(this.settings.dateFormat,this.settings.folder)
 				// 实例化
 				// var solar = Solar.fromDate(new Date());
 				// var lunar = solar.getLunar();
@@ -26,32 +45,58 @@ export default class MyPlugin extends Plugin {
 		});
 	}
 
+	onunload() {
+		// 你插件的卸载逻辑...
+	}
 
-	//  checkFileInFolderExists(fileName, folderPath) {
-	// 	// Get the Vault instance
-	// 	const vault = this.app.vault;
-	//
-	// 	// Get the folder
-	// 	const folder = vault.getAbstractFileByPath(folderPath);
-	//
-	// 	// Check if the folder exists and is a folder
-	// 	if (!folder || !(folder instanceof TFolder)) {
-	// 		new Notice(`The folder "${folderPath}" does not exist.`);
-	// 		return false;
-	// 	}
-	//
-	// 	// Get all files in the folder
-	// 	const files = folder.children.filter(file => file instanceof TFile);
-	//
-	// 	// Check if the file exists in the folder
-	// 	const fileExists = files.some(file => file.name === fileName);
-	// 	// Show a notice with the result
-	// 	if (fileExists) {
-	// 		return true;
-	// 	} else {
-	// 		return false;
-	// 	}
-	// }
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
 }
 
+
+class MomentSettingTab extends PluginSettingTab {
+	plugin: moment;
+
+	constructor(app: App, plugin: moment) {
+		super(app, plugin);
+		this.plugin = plugin;
+	}
+
+	display(): void {
+		const {containerEl} = this;
+
+		containerEl.empty();
+		containerEl.createEl('h3', {text: 'Moment Settings'});
+
+		new Setting(containerEl)
+			.setName('Select Option')
+			.setDesc('Choose an option from the enum')
+			.addDropdown(dropdown =>
+				dropdown
+					.addOption(DateType.Lunar, DateTypes[DateType.Lunar].name)
+					.addOption(DateType.Gregorian, DateTypes[DateType.Gregorian].name)
+					.setValue(this.plugin.settings.dateFormat)
+					.onChange(async (value) => {
+						this.plugin.settings.dateFormat = value as DateType;
+						await this.plugin.saveSettings();
+					}))
+
+		new Setting(containerEl)
+			.setName('Folder Path')
+			.setDesc('Specify the folder path')
+			.addText(text => text
+				.setPlaceholder('Enter folder path')
+				.setValue(this.plugin.settings.folder)
+				.onChange(async (value) => {
+					this.plugin.settings.folder = value;
+					await this.plugin.saveSettings();
+				}));
+	}
+}
 
