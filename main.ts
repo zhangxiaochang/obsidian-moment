@@ -5,11 +5,13 @@ import {Moment} from "./moment";
 interface Settings {
 	dateFormat: DateType;
 	folder: string;
+	titleSize: number;
 }
 
 const DEFAULT_SETTINGS: Settings = {
 	dateFormat: DateType.Lunar,
-	folder: ""
+	folder: "",
+	titleSize: 3
 };
 
 export default class moment extends Plugin {
@@ -95,6 +97,17 @@ class MomentSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.folder)
 				.onChange(async (value) => {
 					this.plugin.settings.folder = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('month Size')
+			.setDesc('Specify the month Size')
+			.addText(text => text
+				.setPlaceholder('Enter folder path')
+				.setValue(String(this.plugin.settings.titleSize))
+				.onChange(async (value) => {
+					this.plugin.settings.titleSize = Number(value);
 					await this.plugin.saveSettings();
 				}));
 	}
