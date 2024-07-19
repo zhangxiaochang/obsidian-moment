@@ -1,17 +1,22 @@
 import {App, Plugin, PluginSettingTab, Setting, Notice, TFile, TFolder} from 'obsidian';
 import {DateType, DateTypes} from "./enum";
 import {Moment} from "./moment";
+import {requestUtils} from "./requestUtils";
 
 interface Settings {
 	dateFormat: DateType;
 	folder: string;
 	titleSize: number;
+	mapKey: string
+	defaultCity: string
 }
 
 const DEFAULT_SETTINGS: Settings = {
 	dateFormat: DateType.Lunar,
 	folder: "",
-	titleSize: 3
+	titleSize: 3,
+	mapKey: '',
+	defaultCity: ''
 };
 
 export default class moment extends Plugin {
@@ -25,8 +30,8 @@ export default class moment extends Plugin {
 		this.addCommand({
 			id: 'open-image-text-editor-modal',
 			name: 'Open Image and Text Editor Modal',
-			callback: () => {
-				new Moment(this.app).execute(this.settings.dateFormat,this.settings.folder)
+			callback: async () => {
+				new Moment(this.app,this.settings.dateFormat,this.settings.folder,this.settings.titleSize,this.settings.mapKey,this.settings.defaultCity).execute()
 				// 实例化
 				// var solar = Solar.fromDate(new Date());
 				// var lunar = solar.getLunar();
@@ -43,6 +48,8 @@ export default class moment extends Plugin {
 				// }
 				// fetchData('https://restapi.amap.com/v3/ip?key=5fa9f5cc69404e6a7299afac184fab7e');
 				// fetchData('https://restapi.amap.com/v3/weather/weatherInfo?key=5fa9f5cc69404e6a7299afac184fab7e&city=110000&extensions=base');
+				var res = await requestUtils.Get('https://restapi.amap.com/v3/ip?key=5fa9f5cc69404e6a7299afac184fab7e')
+				debugger
 			}
 		});
 	}
@@ -104,10 +111,31 @@ class MomentSettingTab extends PluginSettingTab {
 			.setName('month Size')
 			.setDesc('Specify the month Size')
 			.addText(text => text
-				.setPlaceholder('Enter folder path')
+				.setPlaceholder('Enter month Size')
 				.setValue(String(this.plugin.settings.titleSize))
 				.onChange(async (value) => {
 					this.plugin.settings.titleSize = Number(value);
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('map key')
+			.setDesc('Specify the map key')
+			.addText(text => text
+				.setPlaceholder('Enter map key')
+				.setValue(String(this.plugin.settings.mapKey))
+				.onChange(async (value) => {
+					this.plugin.settings.mapKey = value;
+					await this.plugin.saveSettings();
+				}));
+		new Setting(containerEl)
+			.setName('default city')
+			.setDesc('Specify the default city')
+			.addText(text => text
+				.setPlaceholder('Enter default city')
+				.setValue(String(this.plugin.settings.defaultCity))
+				.onChange(async (value) => {
+					this.plugin.settings.defaultCity = value;
 					await this.plugin.saveSettings();
 				}));
 	}
