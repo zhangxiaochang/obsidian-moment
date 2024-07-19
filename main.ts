@@ -9,6 +9,7 @@ interface Settings {
 	titleSize: number;
 	mapKey: string
 	defaultCity: string
+	defaultWeather: string
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -16,7 +17,8 @@ const DEFAULT_SETTINGS: Settings = {
 	folder: "",
 	titleSize: 3,
 	mapKey: '',
-	defaultCity: ''
+	defaultCity: '河北 衡水',
+	defaultWeather: '雨'
 };
 
 export default class moment extends Plugin {
@@ -31,7 +33,7 @@ export default class moment extends Plugin {
 			id: 'open-image-text-editor-modal',
 			name: 'Open Image and Text Editor Modal',
 			callback: async () => {
-				new Moment(this.app,this.settings.dateFormat,this.settings.folder,this.settings.titleSize,this.settings.mapKey,this.settings.defaultCity).execute()
+				new Moment(this.app,this.settings.dateFormat,this.settings.folder,this.settings.titleSize,this.settings.mapKey,this.settings.defaultCity,this.settings.defaultWeather).execute()
 				// 实例化
 				// var solar = Solar.fromDate(new Date());
 				// var lunar = solar.getLunar();
@@ -136,6 +138,17 @@ class MomentSettingTab extends PluginSettingTab {
 				.setValue(String(this.plugin.settings.defaultCity))
 				.onChange(async (value) => {
 					this.plugin.settings.defaultCity = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('default weather')
+			.setDesc('Specify the default weather')
+			.addText(text => text
+				.setPlaceholder('Enter default weather')
+				.setValue(String(this.plugin.settings.defaultWeather))
+				.onChange(async (value) => {
+					this.plugin.settings.defaultWeather = value;
 					await this.plugin.saveSettings();
 				}));
 	}

@@ -13,19 +13,20 @@ export class Moment {
 	titleSize: number // 标题大小
 	mapKey: string // 高德地图key
 	defaultCity: string // 默认城市
+	defaultWeather: string // 默认天气
 
-	constructor(app: App, dateType: string, folderName: string, titleSize: number = 3,mapKey:string,defaultCity: string ) {
+	constructor(app: App, dateType: string, folderName: string, titleSize: number = 3, mapKey: string, defaultCity: string,defaultWeather: string) {
 		this.app = app;
-		this.dateType = dateType; 
+		this.dateType = dateType;
 		this.folderName = folderName;
 		this.titleSize = titleSize;
 		this.mapKey = mapKey;
 		this.defaultCity = defaultCity;
+		this.defaultWeather = defaultWeather;
 	}
 
 	// 执行方法
 	public async execute() {
-		debugger
 		var solar = Solar.fromDate(new Date());
 		// 1-0 获取文件名 判断是否存在 创建or获取  文件名称格式 提供枚举 做setting参数
 		var fileName = this.genfileName(this.dateType, solar);
@@ -38,14 +39,24 @@ export class Moment {
 		var dayTime = this.genTime(this.dateType, solar);
 
 		// 2-0 获取省份城市 对于省份和城市相同的 进行处理（中国 北京） 缺省值 河北 衡水市   高德key做setting参数 缺省值做setting参数
-		var city = await this.genCity(this.mapKey,this.defaultCity);
+		var locationRes = await this.genCity(this.mapKey, this.defaultCity);
+		var location = locationRes;
+		var adcode = null;
 		// 2-1 获取天气 缺省值 雨 缺省值做setting参数
+		if (location instanceof Object) {
+			location = locationRes.location;
+			adcode = locationRes.adcode;
+		}
+		var weather = await this.genWeather(this.mapKey,adcode,this.defaultWeather);
 
 		// 3-0 组装审计信息 时间 天气 地点 写入文件 审计信息格式提供枚举 做setting参数   是否可以对其做个css样式？
-
+		var auditInfo = dayTime + " " + location + " " + weather;
 		// 4-0 操作文件
-		// var file = await this.checkAndCreateFile(filePath);
-		// this.appendMonth(this.dateType,file,solar,this.titleSize)
+		var file = await this.checkAndCreateFile(filePath);
+		// 4-1 写入节气
+		await this.appendTitle(file,titleName,this.titleSize)
+		// 4-2 写入审计
+		await this.appendAudit(file,auditInfo)
 
 
 	}
@@ -100,11 +111,12 @@ export class Moment {
 		var lunar = solar.getLunar();
 		switch (dateType) {
 			case DateType.Lunar:
-				return lunar.getMonthInChinese()+"月"+lunar.getDayInChinese()+"  "+solar.getHour()+":"+solar.getMinute();
+				return lunar.getMonthInChinese() + "月" + lunar.getDayInChinese() + "  " + solar.getHour().toString().padStart(2, '0') + ":" + solar.getMinute().toString().padStart(2, '0');
 			case DateType.Gregorian:
-				return lunar.getMonth()+"月"+lunar.getDay()+" "+lunar.getTime();;
+				return lunar.getMonth() + "月" + lunar.getDay() + " " + lunar.getTime();
+				;
 			default:
-				return lunar.getMonthInChinese()+"月"+lunar.getDayInChinese()+"  "+solar.getHour()+":"+solar.getMinute();
+				return lunar.getMonthInChinese() + "月" + lunar.getDayInChinese() + "  " + solar.getHour() + ":" + solar.getMinute();
 		}
 	}
 
@@ -116,33 +128,63 @@ export class Moment {
 		var status = cityResponse.status;
 		if (status === 1) {
 			var cityInfo = cityResponse.data;
-			var province = cityInfo.province;
-			var city = "";
-			if (String(cityInfo.city).endsWith("市")) {
-				city =  String(cityInfo.city).slice(0, -"市".length);
+			if (cityInfo.status === '1') {
+				var province = cityInfo.province;
+				var adcode = cityInfo.adcode;
+				var city = cityInfo.city;
+				var location = "";
+				if (province === city) {
+					location = "中国" + city;
+				}
+				if (location.endsWith("市")) {
+					location = location.slice(0, -"市".length);
+				}
+				return {
+					location, adcode
+				}
 			}
-			if (province === String(cityInfo.city)) {
-				return "中国 " + city;
-			}
-			return province + city;
 		}
 		return defaultCity;
 
 	}
 
+	private async genWeather(mapKey: string, adcode: string, defaultWeather: string) {
+		if (mapKey === null) {
+			return defaultWeather;
+		}
+		var cityResponse = await requestUtils.Get(this.MAP_URL + "weather/weatherInfo?key=" + mapKey + "&city=" + adcode + "&extensions=base");
+		var status = cityResponse.status;
+		if (status === 1) {
+			var weatherInfo = cityResponse.data;
+			if (weatherInfo.status === '1') {
+				return (weatherInfo.lives)[0].weather;
+			}
+		}
+		return defaultWeather;
+	}
 
-	private async appendMonth(dateType: string, file:TAbstractFile, solar:Solar, titleSize: number): Promise<boolean> {
-		var titleName = this.genMonth(dateType, solar);
+
+	private async appendTitle(file: TAbstractFile, titleName: string, titleSize: number){
 		if (file instanceof TFile) {
 			const fileContent = await this.app.vault.read(file);
 			const titlePrefix = '#'.repeat(titleSize);
 			const regex = new RegExp(`${titlePrefix} ${titleName}`, 'g');
-			var b = regex.test(fileContent);
-			return regex.test(fileContent);
-			return true;
+			var isExist = regex.test(fileContent);
+			if (!isExist){
+				const updatedContent = fileContent + '\n' + `${titlePrefix} ${titleName}`;
+				await this.app.vault.modify(file, updatedContent);
+			}
 		}
 
-		return false;
+	}
+
+	private async appendAudit(file: TAbstractFile, auditinfo :string){
+		if (file instanceof TFile) {
+			const fileContent = await this.app.vault.read(file);
+			const updatedContent = fileContent + '\n' + auditinfo;
+			await this.app.vault.modify(file, updatedContent);
+		}
+
 	}
 
 }

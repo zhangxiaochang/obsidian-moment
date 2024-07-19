@@ -9,6 +9,7 @@ interface requestResponse {
 export class requestUtils {
 	// 静态方法
 	public static async Get(url: string): Promise<requestResponse> {
+		debugger
 		if (url === undefined || url === "" || url === null) {
 			return this.failed("url为空", null);
 		}
