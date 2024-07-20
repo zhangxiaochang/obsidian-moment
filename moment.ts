@@ -1,4 +1,4 @@
-import {App, Plugin, PluginSettingTab, Setting, Notice, TFile, TFolder, TAbstractFile} from 'obsidian';
+import {App, Plugin, PluginSettingTab, Setting, Notice, TFile, TFolder, TAbstractFile, MarkdownView} from 'obsidian';
 import {Solar} from 'lunar-typescript';
 import {DateType} from "./enum";
 import {requestUtils} from "./requestUtils";
@@ -51,13 +51,21 @@ export class Moment {
 
 		// 3-0 组装审计信息 时间 天气 地点 写入文件 审计信息格式提供枚举 做setting参数   是否可以对其做个css样式？
 		var auditInfo = dayTime + " " + location + " " + weather;
+		var auditInfoCSS = `<span class="right-bottom-corner">${auditInfo}</span>`
 		// 4-0 操作文件
 		var file = await this.checkAndCreateFile(filePath);
 		// 4-1 写入节气
 		await this.appendTitle(file,titleName,this.titleSize)
 		// 4-2 写入审计
-		await this.appendAudit(file,auditInfo)
-
+		await this.appendAudit(file,auditInfoCSS)
+		// 5-0 打开文件
+		const leaf = this.app.workspace.getLeaf(true);
+		await leaf.openFile(file, { active: true });
+		this.app.workspace.setActiveLeaf(leaf);
+		const mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if (mdView) {
+			mdView.editor.focus(); // 确保编辑器获得焦点
+		}
 
 	}
 
@@ -67,14 +75,10 @@ export class Moment {
 	private async checkAndCreateFile(filePath: string) {
 
 		let file = this.app.vault.getAbstractFileByPath(filePath);
-		if (file) {
-			new Notice('File exists');
-		} else {
+		if (!file) {
 			// 文件不存在，创建文件
 			file = await this.app.vault.create(filePath, '');  // 空字符串表示创建一个空文件
-			new Notice('File did not exist and has been created');
 		}
-
 		return file;
 	}
 
@@ -181,7 +185,7 @@ export class Moment {
 	private async appendAudit(file: TAbstractFile, auditinfo :string){
 		if (file instanceof TFile) {
 			const fileContent = await this.app.vault.read(file);
-			const updatedContent = fileContent + '\n' + auditinfo;
+			const updatedContent = fileContent + '\n' + '\n' + auditinfo;
 			await this.app.vault.modify(file, updatedContent);
 		}
 

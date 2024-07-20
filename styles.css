@@ -6,3 +6,19 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+.right-bottom-corner {
+	display: block;
+	text-align: right;
+	color: gray; /* 根据需要调整字体颜色 */
+	font-size: 17px; /* 根据需要调整字体大小 */
+	bottom: 10px; /* 距离底部的距离 */
+	right: 17px; /* 距离右边的距离 */
+}
+
+.rounded-corner-box {
+	border: 1px solid #ccc;  /* 边框颜色和宽度 */
+	border-radius: 10px;     /* 圆角半径 */
+	padding: 10px;           /* 内边距 */
+	background-color: #f9f9f9; /* 背景颜色 */
+	margin: 10px 0;          /* 外边距 */
+}
