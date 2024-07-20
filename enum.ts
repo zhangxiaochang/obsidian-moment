@@ -13,3 +13,7 @@ export const DateTypes: { [key in DateType]: DateTypeInfo } = {
 	[DateType.Lunar]: {name: '农历', code: "lunar"},
 	[DateType.Gregorian]: {name: '公历', code: "gregorian"}
 };
+
+export enum StyleType {
+	Simple = "simple",
+}

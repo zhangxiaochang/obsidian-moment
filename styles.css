@@ -15,10 +15,19 @@ If your plugin does not need CSS, delete this file.
 	right: 17px; /* 距离右边的距离 */
 }
 
-.rounded-corner-box {
-	border: 1px solid #ccc;  /* 边框颜色和宽度 */
-	border-radius: 10px;     /* 圆角半径 */
-	padding: 10px;           /* 内边距 */
-	background-color: #f9f9f9; /* 背景颜色 */
-	margin: 10px 0;          /* 外边距 */
+.callout[data-callout="moment"] {
+	--callout-color: 0, 0, 0;
+	--callout-icon: library;
+}
+.callout[data-callout="moment"] {
+	background-color: transparent !important; /* 背景颜色为透明 */
+	border: 1px solid #ccc !important; /* 添加边框 */
+	border-radius: 10px !important; /* 添加圆角 */
+	--callout-color: var(--undefine);
+	--callout-icon: list-todo;
+}
+
+
+.callout[data-callout="moment"] .callout-title{
+	font-size: calc(var(--font-text-size) - 5px);
 }

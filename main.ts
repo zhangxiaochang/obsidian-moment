@@ -1,5 +1,5 @@
 import {App, Plugin, PluginSettingTab, Setting, Notice, TFile, TFolder} from 'obsidian';
-import {DateType, DateTypes} from "./enum";
+import {DateType, DateTypes, StyleType} from "./enum";
 import {Moment} from "./moment";
 import {requestUtils} from "./requestUtils";
 
@@ -10,6 +10,7 @@ interface Settings {
 	mapKey: string
 	defaultCity: string
 	defaultWeather: string
+	styleType: StyleType
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -18,7 +19,8 @@ const DEFAULT_SETTINGS: Settings = {
 	titleSize: 3,
 	mapKey: '',
 	defaultCity: '河北 衡水',
-	defaultWeather: '雨'
+	defaultWeather: '雨',
+	styleType: StyleType.Simple
 };
 
 export default class moment extends Plugin {
@@ -151,6 +153,18 @@ class MomentSettingTab extends PluginSettingTab {
 					this.plugin.settings.defaultWeather = value;
 					await this.plugin.saveSettings();
 				}));
+
+		new Setting(containerEl)
+			.setName('style type')
+			.setDesc('Choose an type from the enum')
+			.addDropdown(dropdown =>
+				dropdown
+					.addOption(StyleType.Simple, "默认")
+					.setValue(this.plugin.settings.styleType)
+					.onChange(async (value) => {
+						this.plugin.settings.styleType = value as StyleType;
+						await this.plugin.saveSettings();
+					}))
 	}
 }
 

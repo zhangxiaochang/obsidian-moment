@@ -1,6 +1,6 @@
-import {App, Plugin, PluginSettingTab, Setting, Notice, TFile, TFolder, TAbstractFile, MarkdownView} from 'obsidian';
+import {App, TAbstractFile, TFile} from 'obsidian';
 import {Solar} from 'lunar-typescript';
-import {DateType} from "./enum";
+import {DateType, StyleType} from "./enum";
 import {requestUtils} from "./requestUtils";
 
 
@@ -14,8 +14,10 @@ export class Moment {
 	mapKey: string // 高德地图key
 	defaultCity: string // 默认城市
 	defaultWeather: string // 默认天气
+	styleType: StyleType // 样式 目前只有一种
 
-	constructor(app: App, dateType: string, folderName: string, titleSize: number = 3, mapKey: string, defaultCity: string,defaultWeather: string) {
+	constructor(app: App, dateType: string, folderName: string, titleSize: number = 3, mapKey: string, defaultCity: string, defaultWeather: string, styleType: StyleType // 样式 目前只有一种
+	) {
 		this.app = app;
 		this.dateType = dateType;
 		this.folderName = folderName;
@@ -23,6 +25,7 @@ export class Moment {
 		this.mapKey = mapKey;
 		this.defaultCity = defaultCity;
 		this.defaultWeather = defaultWeather;
+		this.styleType = styleType;
 	}
 
 	// 执行方法
@@ -44,29 +47,24 @@ export class Moment {
 		var adcode = null;
 		// 2-1 获取天气 缺省值 雨 缺省值做setting参数
 		if (location instanceof Object) {
+			// @ts-ignore
 			location = locationRes.location;
+			// @ts-ignore
 			adcode = locationRes.adcode;
 		}
-		var weather = await this.genWeather(this.mapKey,adcode,this.defaultWeather);
-
-		// 3-0 组装审计信息 时间 天气 地点 写入文件 审计信息格式提供枚举 做setting参数   是否可以对其做个css样式？
-		var auditInfo = dayTime + " " + location + " " + weather;
-		var auditInfoCSS = `<span class="right-bottom-corner">${auditInfo}</span>`
-		// 4-0 操作文件
+		var weather = await this.genWeather(this.mapKey, adcode, this.defaultWeather);
+		// 3-0 获取文件
 		var file = await this.checkAndCreateFile(filePath);
-		// 4-1 写入节气
-		await this.appendTitle(file,titleName,this.titleSize)
-		// 4-2 写入审计
-		await this.appendAudit(file,auditInfoCSS)
-		// 5-0 打开文件
+		// 3-1 组装内容
+		var auditInfo = this.genAuditInfo(dayTime, location, weather, this.styleType);
+		var title =await this.genTitle(file, titleName, this.titleSize);
+		// 3-2 写入文件
+		await this.appendInfo(file, title)
+		await this.appendInfo(file, auditInfo)
+		// 4-0 打开文件
 		const leaf = this.app.workspace.getLeaf(true);
-		await leaf.openFile(file, { active: true });
+		await leaf.openFile(file, {active: true});
 		this.app.workspace.setActiveLeaf(leaf);
-		const mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
-		if (mdView) {
-			mdView.editor.focus(); // 确保编辑器获得焦点
-		}
-
 	}
 
 	// 检查一个文件是否存在  存在直接返回 反之创建文件
@@ -132,9 +130,13 @@ export class Moment {
 		var status = cityResponse.status;
 		if (status === 1) {
 			var cityInfo = cityResponse.data;
+			// @ts-ignore
 			if (cityInfo.status === '1') {
+				// @ts-ignore
 				var province = cityInfo.province;
+				// @ts-ignore
 				var adcode = cityInfo.adcode;
+				// @ts-ignore
 				var city = cityInfo.city;
 				var location = "";
 				if (province === city) {
@@ -160,33 +162,50 @@ export class Moment {
 		var status = cityResponse.status;
 		if (status === 1) {
 			var weatherInfo = cityResponse.data;
+			// @ts-ignore
 			if (weatherInfo.status === '1') {
+				// @ts-ignore
 				return (weatherInfo.lives)[0].weather;
 			}
 		}
 		return defaultWeather;
 	}
 
+	private genAuditInfo(dayTime: string, location: string, weather: string, styleType: StyleType) {
+		var auditInfo = dayTime + " " + location + " " + weather;
+		switch (styleType) {
+			case StyleType.Simple:
+				var auditInfoCSS = `<span class="right-bottom-corner">${auditInfo}</span>`
+				return '\n' + "> [!moment]" + '\n' + ">" + '\n' + ">" + auditInfoCSS;
+			default:
+				var auditInfoCSS = `<span class="right-bottom-corner">${auditInfo}</span>`
+				return '\n' + "> [!moment]" + '\n' + ">" + '\n' + ">" + auditInfoCSS;
+		}
+	}
 
-	private async appendTitle(file: TAbstractFile, titleName: string, titleSize: number){
+	private async genTitle(file: TAbstractFile, titleName: string, titleSize: number) {
 		if (file instanceof TFile) {
 			const fileContent = await this.app.vault.read(file);
 			const titlePrefix = '#'.repeat(titleSize);
 			const regex = new RegExp(`${titlePrefix} ${titleName}`, 'g');
 			var isExist = regex.test(fileContent);
-			if (!isExist){
-				const updatedContent = fileContent + '\n' + `${titlePrefix} ${titleName}`;
-				await this.app.vault.modify(file, updatedContent);
+			if (!isExist) {
+				if (fileContent == ''){
+					return `${titlePrefix} ${titleName}`;
+				}
+				return '\n' + `${titlePrefix} ${titleName}`;
 			}
 		}
 
+		return "";
+
 	}
 
-	private async appendAudit(file: TAbstractFile, auditinfo :string){
+	private async appendInfo(file: TAbstractFile, appendInfo: string) {
 		if (file instanceof TFile) {
 			const fileContent = await this.app.vault.read(file);
-			const updatedContent = fileContent + '\n' + '\n' + auditinfo;
-			await this.app.vault.modify(file, updatedContent);
+			const appendContent = fileContent + appendInfo;
+			await this.app.vault.modify(file, appendContent);
 		}
 
 	}
