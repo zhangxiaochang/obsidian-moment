@@ -56,6 +56,7 @@ export class Moment {
 		// 3-0 获取文件
 		var file = await this.checkAndCreateFile(filePath);
 		// 3-1 组装内容
+		//@ts-ignore
 		var auditInfo = this.genAuditInfo(dayTime, location, weather, this.styleType);
 		var title =await this.genTitle(file, titleName, this.titleSize);
 		// 3-2 写入文件
@@ -63,6 +64,7 @@ export class Moment {
 		await this.appendInfo(file, auditInfo)
 		// 4-0 打开文件
 		const leaf = this.app.workspace.getLeaf(true);
+		//@ts-ignore
 		await leaf.openFile(file, {active: true});
 		this.app.workspace.setActiveLeaf(leaf);
 	}
