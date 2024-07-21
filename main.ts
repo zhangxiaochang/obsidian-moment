@@ -1,7 +1,6 @@
-import {App, Plugin, PluginSettingTab, Setting, Notice, TFile, TFolder} from 'obsidian';
+import {App, Plugin, PluginSettingTab, Setting} from 'obsidian';
 import {DateType, DateTypes, StyleType} from "./enum";
 import {Moment} from "./moment";
-import {requestUtils} from "./requestUtils";
 
 interface Settings {
 	dateFormat: DateType;
@@ -32,34 +31,16 @@ export default class moment extends Plugin {
 		this.addSettingTab(new MomentSettingTab(this.app, this));
 		// 增加命令
 		this.addCommand({
-			id: 'open-image-text-editor-modal',
-			name: 'Open Image and Text Editor Modal',
+			id: 'moment',
+			name: 'moment',
 			callback: async () => {
-				new Moment(this.app,this.settings.dateFormat,this.settings.folder,this.settings.titleSize,this.settings.mapKey,this.settings.defaultCity,this.settings.defaultWeather).execute()
-				// 实例化
-				// var solar = Solar.fromDate(new Date());
-				// var lunar = solar.getLunar();
-				// var filename = lunar.getYearInChinese()+lunar.getYearInGanZhi()+lunar.getYearShengXiao()+"年";
-				// var folder = "100 输入";
-				// var fileByPath =  this.checkFileInFolderExists(filename+".md", folder);
-				// var momth = lunar.getMonthInGanZhi()
-				// if (!fileByPath){
-				// 	this.app.vault.create(folder+"/"+filename+".md",momth)
-				// }else{
-				// 	const file = this.app.vault.getAbstractFileByPath(folder+"/"+filename+".md");
-				// 	 this.app.vault.append(file,"testestest")
-				// 	// 向文件内容追加新内容
-				// }
-				// fetchData('https://restapi.amap.com/v3/ip?key=5fa9f5cc69404e6a7299afac184fab7e');
-				// fetchData('https://restapi.amap.com/v3/weather/weatherInfo?key=5fa9f5cc69404e6a7299afac184fab7e&city=110000&extensions=base');
-				var res = await requestUtils.Get('https://restapi.amap.com/v3/ip?key=5fa9f5cc69404e6a7299afac184fab7e')
-				debugger
+				new Moment(this.app, this.settings.dateFormat, this.settings.folder, this.settings.titleSize, this.settings.mapKey, this.settings.defaultCity, this.settings.defaultWeather, this.settings.styleType).execute()
 			}
 		});
 	}
 
 	onunload() {
-		// 你插件的卸载逻辑...
+
 	}
 
 
