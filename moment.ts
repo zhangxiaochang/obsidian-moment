@@ -178,10 +178,10 @@ export class Moment {
 		switch (styleType) {
 			case StyleType.Simple:
 				var auditInfoCSS = `<span class="right-bottom-corner">${auditInfo}</span>`
-				return '\n' + "> [!moment]" + '\n' + ">" + '\n' + ">" + auditInfoCSS;
+				return '\n'+'\n' + "> [!moment]" + '\n' + ">" + '\n' + ">" + auditInfoCSS;
 			default:
 				var auditInfoCSS = `<span class="right-bottom-corner">${auditInfo}</span>`
-				return '\n' + "> [!moment]" + '\n' + ">" + '\n' + ">" + auditInfoCSS;
+				return '\n'+'\n' + "> [!moment]" + '\n' + ">" + '\n' + ">" + auditInfoCSS;
 		}
 	}
 

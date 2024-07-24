@@ -10,11 +10,11 @@
 
 欢迎大家试用，提问题。
 ## 效果图
-![img.png](web/效果图.png)
+![img.png](docs/效果图.png)
 
 ## 捐赠/联系
 ### 微信
-<img src="web/微信.png" width="500" height="700">
+<img src="docs/微信.png" width="500" height="700">
 
 ### 捐赠
-<img src="web/微信收款.png" width="500" height="700">
+<img src="docs/微信收款.png" width="500" height="700">
