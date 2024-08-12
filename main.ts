@@ -1,6 +1,7 @@
 import {App, Plugin, PluginSettingTab, Setting} from 'obsidian';
 import {DateType, DateTypes, StyleType} from "./enum";
 import {Moment} from "./moment";
+import {EditorModal} from "./editorModal";
 
 interface Settings {
 	dateFormat: DateType;
@@ -34,7 +35,7 @@ export default class moment extends Plugin {
 			id: 'moment',
 			name: 'moment',
 			callback: async () => {
-				new Moment(this.app, this.settings.dateFormat, this.settings.folder, this.settings.titleSize, this.settings.mapKey, this.settings.defaultCity, this.settings.defaultWeather, this.settings.styleType).execute()
+				new EditorModal(this.app, this.settings.dateFormat, this.settings.folder, this.settings.titleSize, this.settings.mapKey, this.settings.defaultCity, this.settings.defaultWeather, this.settings.styleType).open()
 			}
 		});
 	}

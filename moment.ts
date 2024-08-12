@@ -15,8 +15,9 @@ export class Moment {
 	defaultCity: string // 默认城市
 	defaultWeather: string // 默认天气
 	styleType: StyleType // 样式 目前只有一种
+	context: string
 
-	constructor(app: App, dateType: string, folderName: string, titleSize: number = 3, mapKey: string, defaultCity: string, defaultWeather: string, styleType: StyleType // 样式 目前只有一种
+	constructor(app: App, dateType: string, folderName: string, titleSize: number = 3, mapKey: string, defaultCity: string, defaultWeather: string, styleType: StyleType ,context:string// 样式 目前只有一种
 	) {
 		this.app = app;
 		this.dateType = dateType;
@@ -26,6 +27,7 @@ export class Moment {
 		this.defaultCity = defaultCity;
 		this.defaultWeather = defaultWeather;
 		this.styleType = styleType;
+		this.context = context;
 	}
 
 	// 执行方法
@@ -56,17 +58,18 @@ export class Moment {
 		// 3-0 获取文件
 		var file = await this.checkAndCreateFile(filePath);
 		// 3-1 组装内容
-		//@ts-ignore
-		var auditInfo = this.genAuditInfo(dayTime, location, weather, this.styleType);
 		var title =await this.genTitle(file, titleName, this.titleSize);
+		var context =await this.genContext(this.context);
+		//@ts-ignore
+		var auditInfo = this.genAuditInfo(dayTime, location, weather, this.styleType,context);
 		// 3-2 写入文件
 		await this.appendInfo(file, title)
 		await this.appendInfo(file, auditInfo)
-		// 4-0 打开文件
-		const leaf = this.app.workspace.getLeaf(true);
-		//@ts-ignore
-		await leaf.openFile(file, {active: true});
-		this.app.workspace.setActiveLeaf(leaf);
+		// // 4-0 打开文件
+		// const leaf = this.app.workspace.getLeaf(true);
+		// //@ts-ignore
+		// await leaf.openFile(file, {active: true});
+		// this.app.workspace.setActiveLeaf(leaf);
 	}
 
 	// 检查一个文件是否存在  存在直接返回 反之创建文件
@@ -96,7 +99,6 @@ export class Moment {
 
 
 	private genMonth(dateType: string, solar: Solar): string {
-		debugger
 		var lunar = solar.getLunar();
 		switch (dateType) {
 			case DateType.Lunar:
@@ -108,6 +110,17 @@ export class Moment {
 				var month = lunar.getCurrentJieQi() == null ? lunar.getPrevJieQi()?.getName() : lunar.getCurrentJieQi()?.getName();
 				return <string>month;
 		}
+	}
+
+	private genContext(context:string): string {
+		// 将文本按换行符分割成数组
+		const lines = context.split('\n');
+
+		// 为每一行添加前缀
+		const prefixedLines = lines.map(line => `> ${line}`);
+
+		// 将数组重新拼接为字符串
+		return prefixedLines.join('\n');
 	}
 
 	private genTime(dateType: string, solar: Solar): string {
@@ -173,15 +186,15 @@ export class Moment {
 		return defaultWeather;
 	}
 
-	private genAuditInfo(dayTime: string, location: string, weather: string, styleType: StyleType) {
+	private genAuditInfo(dayTime: string, location: string, weather: string, styleType: StyleType, context: string) {
 		var auditInfo = dayTime + " " + location + " " + weather;
 		switch (styleType) {
 			case StyleType.Simple:
 				var auditInfoCSS = `<span class="right-bottom-corner">${auditInfo}</span>`
-				return '\n'+'\n' + "> [!moment]" + '\n' + ">" + '\n' + ">" + auditInfoCSS;
+				return '\n' + '\n' + "> [!moment]" + '\n' + context + '\n' + ">" + auditInfoCSS;
 			default:
 				var auditInfoCSS = `<span class="right-bottom-corner">${auditInfo}</span>`
-				return '\n'+'\n' + "> [!moment]" + '\n' + ">" + '\n' + ">" + auditInfoCSS;
+				return '\n' + '\n' + "> [!moment]" + '\n' + context + '\n' + ">" + auditInfoCSS;
 		}
 	}
 
