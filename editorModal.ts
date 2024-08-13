@@ -1,17 +1,24 @@
-import {App, Modal} from 'obsidian';
+import {App, Modal, TFile} from 'obsidian';
 import {StyleType} from "./enum";
 import {Moment} from "./moment";
 
 
 export class EditorModal extends Modal {
-	editor :unknown;
+	editor: unknown;
 	moment: Moment;
-	constructor(app: App, dateType: string, folderName: string, titleSize: number = 3, mapKey: string, defaultCity: string, defaultWeather: string, styleType: StyleType // 样式 目前只有一种
+	transfer:string;
+
+
+	constructor(app: App, dateType: string, folderName: string, titleSize: number = 3, mapKey: string, defaultCity: string, defaultWeather: string, styleType: StyleType, transfer:string
 	) {
 		super(app)
+		this.transfer = transfer;
 		this.moment = new Moment(this.app, dateType, folderName, titleSize, mapKey, defaultCity, defaultWeather, styleType, '');
 	}
-	onOpen() {
+
+	async onOpen() {
+		// 打开对应文件
+		await this.openFile(this.transfer);
 		const editor = this.creatEditor(this.app);
 		editor.set('moment');
 		editor.load()
@@ -26,16 +33,19 @@ export class EditorModal extends Modal {
 		this.modalEl.style.display = 'none'
 		this.editor = editor;
 	};
-	async onClose(){
+
+	async onClose() {
 		// @ts-ignore
 		var context = this.editor.editor.getValue()
-		if (context !== 'moment' && context){
+		if (context !== 'moment' && context) {
 			this.moment.context = context;
-			this.moment.execute();
+			await this.moment.execute();
+			this.closeFile();
 		}
 
 	}
-	private creatEditor(app:App) {
+
+	private creatEditor(app: App) {
 		// @ts-ignore
 		const markdown = app.embedRegistry.embedByExtension.md({app, containerEl: createDiv()})
 		debugger
@@ -58,5 +68,26 @@ export class EditorModal extends Modal {
 			getMode: () => 'source',
 		})
 		return editor
+	}
+
+	private async openFile(filePath: string) {
+		// 获取文件对象
+		const file = this.app.vault.getAbstractFileByPath(filePath);
+		if (!file) {
+			return;
+		}
+		// 打开文件
+		const leaf = this.app.workspace.getLeaf(true);
+		if (file instanceof TFile) {
+			await leaf.openFile(file);
+			this.app.workspace.setActiveLeaf(leaf, {focus: true});
+		}
+	}
+
+	private async closeFile() {
+		const activeLeaf = this.app.workspace.activeLeaf;
+		if (activeLeaf) {
+			activeLeaf.detach();
+		}
 	}
 }

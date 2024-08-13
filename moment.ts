@@ -65,11 +65,6 @@ export class Moment {
 		// 3-2 写入文件
 		await this.appendInfo(file, title)
 		await this.appendInfo(file, auditInfo)
-		// // 4-0 打开文件
-		// const leaf = this.app.workspace.getLeaf(true);
-		// //@ts-ignore
-		// await leaf.openFile(file, {active: true});
-		// this.app.workspace.setActiveLeaf(leaf);
 	}
 
 	// 检查一个文件是否存在  存在直接返回 反之创建文件

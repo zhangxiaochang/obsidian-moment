@@ -11,6 +11,7 @@ interface Settings {
 	defaultCity: string
 	defaultWeather: string
 	styleType: StyleType
+	transfer:string
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -20,7 +21,8 @@ const DEFAULT_SETTINGS: Settings = {
 	mapKey: '',
 	defaultCity: '河北 衡水',
 	defaultWeather: '雨',
-	styleType: StyleType.Simple
+	styleType: StyleType.Simple,
+	transfer:''
 };
 
 export default class moment extends Plugin {
@@ -35,7 +37,7 @@ export default class moment extends Plugin {
 			id: 'moment',
 			name: 'moment',
 			callback: async () => {
-				new EditorModal(this.app, this.settings.dateFormat, this.settings.folder, this.settings.titleSize, this.settings.mapKey, this.settings.defaultCity, this.settings.defaultWeather, this.settings.styleType).open()
+				new EditorModal(this.app, this.settings.dateFormat, this.settings.folder, this.settings.titleSize, this.settings.mapKey, this.settings.defaultCity, this.settings.defaultWeather, this.settings.styleType,this.settings.transfer).open()
 			}
 		});
 	}
@@ -114,6 +116,18 @@ class MomentSettingTab extends PluginSettingTab {
 					this.plugin.settings.mapKey = value;
 					await this.plugin.saveSettings();
 				}));
+
+		new Setting(containerEl)
+			.setName('transfer')
+			.setDesc('Specify the transfer files')
+			.addText(text => text
+				.setPlaceholder('Enter transfer')
+				.setValue(String(this.plugin.settings.transfer))
+				.onChange(async (value) => {
+					this.plugin.settings.transfer = value;
+					await this.plugin.saveSettings();
+				}));
+
 		new Setting(containerEl)
 			.setName('default city')
 			.setDesc('Specify the default city')
