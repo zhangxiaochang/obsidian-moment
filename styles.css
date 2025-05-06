@@ -14,6 +14,14 @@ If your plugin does not need CSS, delete this file.
 	bottom: 10px; /* 距离底部的距离 */
 	right: 17px; /* 距离右边的距离 */
 }
+.right-top-corner {
+	display: block;
+	text-align: right;
+	color: gray; /* 根据需要调整字体颜色 */
+	font-size: 17px; /* 根据需要调整字体大小 */
+	top: 10px; /* 距离底部的距离 */
+	left: 17px; /* 距离右边的距离 */
+}
 
 .callout[data-callout="moment"] {
 	--callout-color: 0, 0, 0;
@@ -29,5 +37,14 @@ If your plugin does not need CSS, delete this file.
 
 
 .callout[data-callout="moment"] .callout-title{
+	font-size: calc(var(--font-text-size) - 5px);
+}
+
+
+.callout[data-callout="memo"] {
+	--callout-icon: notebook-text;
+}
+
+.callout[data-callout="memo"] .callout-title{
 	font-size: calc(var(--font-text-size) - 5px);
 }

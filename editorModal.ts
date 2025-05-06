@@ -1,26 +1,45 @@
 import {App, Modal, TFile} from 'obsidian';
 import {StyleType} from "./enum";
 import {Moment} from "./moment";
-
+import {PluginSettings} from "./settings"; // 导入 PluginSettings 类
+import { Memo } from 'memo';
 
 export class EditorModal extends Modal {
 	editor: unknown;
-	moment: Moment;
+ 	moment: Moment;
+	memo:Memo
 	transfer:string;
+	setting: PluginSettings; // 声明 setting 变量
 
-
-	constructor(app: App, dateType: string, folderName: string, titleSize: number = 3, mapKey: string, defaultCity: string, defaultWeather: string, styleType: StyleType, transfer:string
-	) {
-		super(app)
-		this.transfer = transfer;
-		this.moment = new Moment(this.app, dateType, folderName, titleSize, mapKey, defaultCity, defaultWeather, styleType, '');
+	// 修改构造函数以接收 PluginSettings 实例
+	constructor(app: App, settings: PluginSettings) {
+		super(app);
+		this.transfer = settings.transfer;
+		this.setting = settings; // 初始化 setting 变量
+		this.moment = new Moment(
+			this.app,
+			settings,
+			''
+		);
+		this.memo = new Memo(
+			this.app,
+			settings,
+			''
+		);
 	}
 
 	async onOpen() {
 		// 打开对应文件
 		await this.openFile(this.transfer);
 		const editor = this.creatEditor(this.app);
-		editor.set('moment');
+		switch (this.setting.styleType) {
+			case StyleType.Memo:
+				editor.set('momo');
+				break;
+			default:
+				editor.set('moment');
+				break;
+		}
 		editor.load();
 		// 动态计算尺寸
 		const calcSize = () => {
@@ -77,10 +96,24 @@ export class EditorModal extends Modal {
 	async onClose() {
 		// @ts-ignore
 		var context = this.editor.editor.getValue()
-		if (context !== 'moment' && context) {
-			this.moment.context = context;
-			await this.moment.execute();
-			this.closeFile();
+		
+		switch (this.setting.styleType) {
+			case StyleType.Simple:
+				if (context !== 'moment' && context) {
+					this.moment.context = context;
+					await this.moment.execute();
+					this.closeFile();
+				}
+				break;
+			case StyleType.Memo:
+				if (context !== 'memo' && context) {
+					this.memo.context = context;
+					await this.memo.execute();
+					this.closeFile();
+				}
+				break;
+			default:
+				break;
 		}
 
 	}
@@ -88,7 +121,6 @@ export class EditorModal extends Modal {
 	private creatEditor(app: App) {
 		// @ts-ignore
 		const markdown = app.embedRegistry.embedByExtension.md({app, containerEl: createDiv()})
-		debugger
 		markdown.load();
 		markdown.editable = !0;
 		markdown.showEditor()

@@ -16,4 +16,5 @@ export const DateTypes: { [key in DateType]: DateTypeInfo } = {
 
 export enum StyleType {
 	Simple = "simple",
+	Memo = "memo"
 }
